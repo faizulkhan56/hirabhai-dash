@@ -4,14 +4,14 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit')
 
 const app = express();
-const port = 3004;
+const port = 3007;
 
 // Enable CORS for all routes
 app.use(cors());
 
 const videoRateLimitSegments = rateLimit({
     windowMs: 10 * 1000, // 10 second
-    max: 2, // limit each IP to 100 requests per windowMs
+    max: 5, // limit each IP to 100 requests per windowMs
     message: 'Too many requests, please try again later.'
 });
 
