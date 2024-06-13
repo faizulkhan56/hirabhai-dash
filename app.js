@@ -1,12 +1,21 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit')
 
 const app = express();
 const port = 3004;
 
 // Enable CORS for all routes
 app.use(cors());
+
+const videoRateLimitSegments = rateLimit({
+    windowMs: 10 * 1000, // 10 second
+    max: 2, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests, please try again later.'
+});
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 // Serve the DASH manifest file
 app.get('/video.mpd', (req, res) => {
@@ -16,7 +25,7 @@ app.get('/video.mpd', (req, res) => {
 });
 
 // Serve the DASH segment files
-app.get('/video/:segment', (req, res) => {
+app.get('/video/:segment', videoRateLimitSegments, (req, res) => {
     console.log("called segment");
     const segment = req.params.segment;
     const filePath = path.join(__dirname, 'video', segment);
