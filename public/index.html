@@ -229,6 +229,8 @@
     </div>
 
     <script>
+        let auth = '';
+
         const url = 'http://localhost:3007/video.mpd';
         const player = dashjs.MediaPlayer().create();
         player.initialize(document.querySelector("#videoPlayer"), url, true);
@@ -244,6 +246,9 @@
                 try {
                     const response = await fetch('http://localhost:3007/upload', {
                         method: 'POST',
+                        headers: {
+                            'Authorization': `Basic ${auth}`
+                        },
                         body: formData
                     });
 
@@ -264,6 +269,7 @@
         function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            auth = btoa(`${username}:${password}`);
 
             fetch('http://localhost:3007/login', {
                 method: 'POST',
