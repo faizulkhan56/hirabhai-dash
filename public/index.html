@@ -231,7 +231,7 @@
     <script>
         let auth = '';
 
-        const url = 'http://localhost:3007/video.mpd';
+        const url = 'http://18.212.211.90:3007/video.mpd';
         const player = dashjs.MediaPlayer().create();
         player.initialize(document.querySelector("#videoPlayer"), url, true);
 
@@ -244,7 +244,7 @@
                 formData.append('videoFile', fileField.files[0]);
 
                 try {
-                    const response = await fetch('http://localhost:3007/upload', {
+                    const response = await fetch('http://18.212.211.90:3007/upload', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Basic ${auth}`
@@ -271,7 +271,7 @@
             const password = document.getElementById('password').value;
             auth = btoa(`${username}:${password}`);
 
-            fetch('http://localhost:3007/login', {
+            fetch('http://18.212.211.90:3007/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
