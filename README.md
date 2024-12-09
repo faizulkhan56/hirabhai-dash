@@ -353,6 +353,11 @@ vi index.html
 </html>
 
 ```
+need to add ec2 IP
+1.const response = await fetch('http://3.94.196.187:3007/upload'
+2.fetch('http://3.94.196.187:3007/login'
+3.const url = 'http://3.94.196.187:3007/video.mpd'
+
 
 ## Additional Resources
 
