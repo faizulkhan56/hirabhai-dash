@@ -125,6 +125,15 @@ This guide will help you set up the DASH VOD Project using PM2, NGINX, Node.js o
     }
     ```
 
+Enable the Configuration
+If you're using sites-available, link the configuration to sites-enabled:
+
+ ```sh
+
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+```
+
 3. Test the NGINX configuration:
 
     ```sh
