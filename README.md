@@ -136,7 +136,24 @@ This guide will help you set up the DASH VOD Project using PM2, NGINX, Node.js o
     ```sh
     sudo systemctl reload nginx
     ```
+5. Ensure the application files are located in the directory specified in the root directive (e.g., /var/www/html):
 
+ Set the Correct Permissions
+
+```sh
+sudo chown -R www-data:www-data /home/ubuntu/dash-hirabhai-git-folder/public
+sudo chmod -R 755 /home/ubuntu/dash-hirabhai-git-folder/public
+
+```
+Ensure Index File Exists
+Make sure an index.html file exists in the directory:
+```sh
+cd /home/ubuntu/dash-hirabhai-git-folder/public
+ll
+-rwxr-xr-x 1 www-data www-data 9686 Dec  9 04:02 index.html*
+
+
+```
 ## Step 6: Install Project Dependencies
 
 1. Navigate to your project directory:
