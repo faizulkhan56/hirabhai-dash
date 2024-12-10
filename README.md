@@ -125,6 +125,15 @@ This guide will help you set up the DASH VOD Project using PM2, NGINX, Node.js o
     }
     ```
 
+Enable the Configuration
+If you're using sites-available, link the configuration to sites-enabled:
+
+ ```sh
+
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+```
+
 3. Test the NGINX configuration:
 
     ```sh
@@ -136,7 +145,24 @@ This guide will help you set up the DASH VOD Project using PM2, NGINX, Node.js o
     ```sh
     sudo systemctl reload nginx
     ```
+5. Ensure the application files are located in the directory specified in the root directive (e.g., /var/www/html):
 
+ Set the Correct Permissions
+
+```sh
+sudo chown -R www-data:www-data /home/ubuntu/dash-hirabhai-git-folder/public
+sudo chmod -R 755 /home/ubuntu/dash-hirabhai-git-folder/public
+
+```
+Ensure Index File Exists
+Make sure an index.html file exists in the directory:
+```sh
+cd /home/ubuntu/dash-hirabhai-git-folder/public
+ll
+-rwxr-xr-x 1 www-data www-data 9686 Dec  9 04:02 index.html*
+
+
+```
 ## Step 6: Install Project Dependencies
 
 1. Navigate to your project directory:
@@ -173,10 +199,169 @@ This guide will help you set up the DASH VOD Project using PM2, NGINX, Node.js o
 1. Update your EC2 security group to allow HTTP (port 80), HTTPS (port 443), and SSH (port 22) traffic.
 2. (Optional) Configure a domain name to point to your EC2 instance using Route 53 or any other DNS provider.
 
-## Step 9: Test Your Application
+## Step 9: Test and reconfigure Your Application
 
-1. Open a web browser and navigate to your EC2 public IP or domain name.
+1. Open a web browser and navigate to your EC2 public IP or domain name like below
+   http://3.94.196.187:3007/
+   give Username: admin
+   password:password
+   
 2. You should see your DASH VOD project running.
+3. for reconfiguring if you stop the ec2 machine the public ip may change in this case have to do below
+```sh
+cd /home/ubuntu/dash-hirabhai-git-folder/video
+vi video.mpd
+ <BaseURL>http://3.94.196.187:3007/video/</BaseURL>
+                        <Representation id="0" mimeType="video/mp4" codecs="avc1.640028" bandwidth="2400000" width="1920" height="1080" sar="1:1">
+                                <SegmentTemplate timescale="15360" initialization="init-stream$RepresentationID$.m4s" media="chunk-stream$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+                                        <SegmentTimeline>
+                                                <S t="0" d="128000" r="2" />
+                                                <S d="77312" />
+                                        </SegmentTimeline>
+                                </SegmentTemplate>
+                        </Representation>
+                </AdaptationSet>
+                <AdaptationSet id="1" contentType="audio" startWithSAP="1" segmentAlignment="true" bitstreamSwitching="true" lang="und">
+                    <BaseURL>http://3.94.196.187:3007/video/</BaseURL>
+                        <Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="128000" audioSamplingRate="48000">
+                                <AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+                                <SegmentTemplate timescale="48000" initialization="init-stream$RepresentationID$.m4s" media="chunk-stream$RepresentationID$-$Number%05d$.m4s" startNumber="1"
+
+```
+Place your ec2 public ip in the above 2 places.
+
+Then need to change in public html FE page index.html page
+```sh
+cd /home/ubuntu/dash-hirabhai-git-folder/public
+vi index.html
+<body>
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="button" onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-content" id="mainContent" style="display: none;">
+        <div class="header">
+            <div class="logo"><i class="fas fa-play-circle"></i> MyVideoSite</div>
+            <div class="menu">
+                <a href="#"><i class="fas fa-home"></i> Home</a>
+                <a href="#"><i class="fas fa-video"></i> Videos</a>
+                <a href="#"><i class="fas fa-user"></i> Profile</a>
+            </div>
+        </div>
+        <div class="container">
+            <div class="video-container">
+                <video id="videoPlayer" controls></video>
+            </div>
+            <div class="title">Sample Video Title</div>
+            <div class="description">This is a description of the video. It provides some context and additional information about the video content.</div>
+            <div class="comments-section">
+                <div class="comment">
+                    <span class="comment-author">User1:</span>
+                    <span class="comment-text">This is a great video!</span>
+                </div>
+                <div class="comment">
+                    <span class="comment-author">User2:</span>
+                    <span class="comment-text">Very informative, thanks for sharing!</span>
+                </div>
+                <div class="add-comment">
+                    <textarea placeholder="Add a public comment..."></textarea>
+                    <button type="button">Comment</button>
+                </div>
+            </div>
+            <div class="upload-section">
+                <h3>Upload a Video</h3>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="file" name="videoFile" id="videoFile" accept="video/*"><br>
+                    <button type="submit">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let auth = '';
+
+        const url = 'http://3.94.196.187:3007/video.mpd';
+        const player = dashjs.MediaPlayer().create();
+        player.initialize(document.querySelector("#videoPlayer"), url, true);
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const fileField = document.getElementById('videoFile');
+
+            if (fileField.files.length > 0) {
+                formData.append('videoFile', fileField.files[0]);
+
+                try {
+                    const response = await fetch('http://3.94.196.187:3007/upload', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Basic ${auth}`
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        alert('File uploaded successfully.');
+                    } else {
+                        alert('Failed to upload file.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while uploading the file.');
+                }
+            } else {
+                alert('Please select a file to upload.');
+            }
+        });
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            auth = btoa(`${username}:${password}`);
+
+            fetch('http://3.94.196.187:3007/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                } else {
+                    alert('Login failed. Please check your credentials.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during login.');
+            });
+        }
+    </script>
+</body>
+</html>
+
+```
+need to add ec2 IP
+
+```sh
+
+1.const response = await fetch('http://3.94.196.187:3007/upload'
+2.fetch('http://3.94.196.187:3007/login'
+3.const url = 'http://3.94.196.187:3007/video.mpd'
+
+```
 
 ## Additional Resources
 
