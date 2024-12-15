@@ -1,0 +1,33 @@
+User Stories
+
+User Login
+
+As a user, I want to log in to the application using my username and password so that I can access the video upload and playback features.
+
+Video Upload
+
+As an authenticated user, I want to upload a video file so that it can be processed and made available for streaming.
+
+Video Processing
+
+As a system, I want to process the uploaded video file using FFmpeg to generate DASH files so that the video can be streamed efficiently.
+
+Video Playback
+
+As a user, I want to play the uploaded video using a DASH player so that I can watch the video content.
+
+Commenting on Videos
+
+As a user, I want to add comments to videos so that I can share my thoughts and feedback with others.
+
+View Comments
+
+As a user, I want to view comments made by other users on the video so that I can see their feedback.
+
+Rate Limiting
+
+As a system, I want to implement rate limiting on video segment requests to prevent abuse and ensure fair usage.
+
+Static File Serving
+
+As a user, I want to access static files (like HTML, CSS, and JavaScript) so that I can interact with the web application.

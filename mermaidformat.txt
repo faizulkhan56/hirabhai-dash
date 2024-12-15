@@ -1,0 +1,15 @@
+graph TD
+    A[User] -->|Interacts with| B[Frontend - index.html]
+    B -->|Sends login request| C[Backend - app.js]
+    C -->|Validates credentials| D[Authentication]
+    D -->|Success| B
+    D -->|Failure| B
+    B -->|Uploads video| C
+    C -->|Processes video| E[FFmpeg]
+    E -->|Generates DASH files| F[Video Storage]
+    C -->|Serves DASH manifest| G[video.mpd]
+    C -->|Serves DASH segments| H[Video Segments]
+    B -->|Plays video| G
+    B -->|Requests segments| H
+    I[NGINX] -->|Routes requests| C
+    I -->|Serves static files| B
